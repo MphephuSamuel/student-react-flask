@@ -8,13 +8,21 @@ import { Chart as ChartJS } from 'chart.js/auto';
 const Dashboard = () => {
     const [students, setStudents] = useState([]);
     const [staff, setStaff] = useState([]);
+    const [loading, setLoading] = useState(true); // To track loading state
+    const [error, setError] = useState(null); // To track any errors during the fetch
 
     useEffect(() => {
         const fetchData = async () => {
-            const studentsData = await getStudents();
-            const staffData = await getStaff();
-            setStudents(studentsData);
-            setStaff(staffData);
+            try {
+                const studentsData = await getStudents();
+                const staffData = await getStaff();
+                setStudents(studentsData);
+                setStaff(staffData);
+                setLoading(false); // Data is loaded
+            } catch (err) {
+                setError("Failed to load data."); // Set error if something goes wrong
+                setLoading(false); // Stop loading
+            }
         };
 
         fetchData();
@@ -30,6 +38,16 @@ const Dashboard = () => {
             },
         ],
     };
+
+    // If the page is still loading
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
+    // If there was an error loading the data
+    if (error) {
+        return <div>{error}</div>;
+    }
 
     return (
         <div style={{ padding: 20 }}>
